@@ -1,0 +1,120 @@
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;700&display=swap');
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Plus Jakarta Sans", "Inter", sans-serif;
+  --font-mono: "JetBrains Mono", monospace;
+  
+  --color-slate-50: #0a0f1e;
+  --color-slate-100: rgba(255, 255, 255, 0.05);
+  --color-slate-150: rgba(255, 255, 255, 0.06);
+  --color-slate-200: rgba(255, 255, 255, 0.08);
+  --color-slate-300: rgba(255, 255, 255, 0.15);
+  --color-slate-350: rgba(255, 255, 255, 0.2);
+  --color-slate-400: #94a3b8;
+  --color-slate-450: #64748b;
+  --color-slate-500: #64748b;
+  --color-slate-650: #cbd5e1;
+  --color-slate-700: #475569;
+  --color-slate-705: #f1f5f9;
+  --color-slate-800: rgba(255, 255, 255, 0.05);
+  --color-slate-805: rgba(255, 255, 255, 0.05);
+  --color-slate-850: rgba(255, 255, 255, 0.05);
+  --color-slate-900: #111827;
+  --color-slate-950: #0a0f1e;
+  
+  --color-indigo-600: #4f46e5;
+  --color-blue-500: #3b82f6;
+  --color-blue-600: #2563eb;
+}
+
+@layer utilities {
+  .hover-zoom {
+    transition: all 0.25s cubic-bezier(0.1, 0.8, 0.1, 1);
+  }
+  .hover-zoom:hover {
+    transform: translateY(-2px) scale(1.02);
+  }
+  .animate-fadeIn {
+    animation: fadeIn 0.3s ease-out forwards;
+  }
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+}
+
+/* Force modern deep navy background (#0A0F1E) as defined in the request */
+html, body {
+  background-color: #0A0F1E !important;
+  color: #f1f5f9 !important;
+}
+
+/* Style cards, headers, sidebars with standard classes to look perfect in both modes */
+.bg-white {
+  background-color: rgba(17, 24, 39, 0.6) !important;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-color: rgba(255, 255, 255, 0.05) !important;
+}
+
+.dark\:bg-slate-900 {
+  background-color: rgba(17, 24, 39, 0.6) !important;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-color: rgba(255, 255, 255, 0.05) !important;
+}
+
+.bg-slate-50, .dark\:bg-slate-950, .dark\:bg-slate-955 {
+  background-color: #0A0F1E !important;
+}
+
+/* Fine-tune all border-slate classes to look like sleek white/5 or white/10 lines */
+.border-slate-100, .border-slate-105, .border-slate-150, .border-slate-200, .dark\:border-slate-800, .dark\:border-slate-805, .dark\:border-slate-850 {
+  border-color: rgba(255, 255, 255, 0.05) !important;
+}
+
+/* Texts style adjustments for maximum readability */
+.text-slate-755, .text-slate-705, .text-slate-800, .text-slate-700, .text-slate-650 {
+  color: #e2e8f0 !important;
+}
+
+.text-slate-400, .text-slate-500, .text-slate-505 {
+  color: #94a3b8 !important;
+}
+
+.text-slate-950 {
+  color: #0a0f1e !important;
+}
+
+/* Ensure buttons and elements with color styles render sharp and readable */
+button.bg-white {
+  background-color: #ffffff !important;
+  color: #0a0f1e !important;
+  border-color: transparent !important;
+}
+button.bg-white:hover {
+  background-color: #e2e8f0 !important;
+}
+
+/* Custom Scrollbars */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.25);
+}
+
+/* Global transitions */
+input, select, textarea, button {
+  transition: all 0.15s ease-in-out;
+}
+

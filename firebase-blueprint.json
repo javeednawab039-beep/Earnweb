@@ -1,0 +1,134 @@
+{
+  "entities": {
+    "User": {
+      "title": "User",
+      "description": "Public user profile for leaderboards and general metadata.",
+      "type": "object",
+      "properties": {
+        "displayName": { "type": "string", "description": "The user's visible name" },
+        "photoURL": { "type": "string", "description": "Avatar URL" },
+        "level": { "type": "number", "description": "User tier level" },
+        "coins": { "type": "number", "description": "Current Coins Balance" },
+        "pkr": { "type": "number", "description": "Current PKR cash balance" },
+        "referralCode": { "type": "string", "description": "User's unique referral invitation code" },
+        "referredBy": { "type": "string", "description": "UID of the user who referred them" },
+        "referralsCount": { "type": "number", "description": "Total users referred" },
+        "tasksCount": { "type": "number", "description": "Number of completed tasks" },
+        "dailyBonusLastClaimed": { "type": "string", "format": "date-time", "description": "ISO timestamp of last daily bonus claim" },
+        "createdAt": { "type": "string", "format": "date-time", "description": "User creation time" }
+      },
+      "required": ["displayName", "coins", "pkr", "referralCode", "referralsCount", "tasksCount"]
+    },
+    "UserPrivate": {
+      "title": "UserPrivate",
+      "description": "Sensitive personal information, accessible only to the owner and admins.",
+      "type": "object",
+      "properties": {
+        "email": { "type": "string", "description": "Email address" },
+        "paymentMethod": { "type": "string", "description": "Preferred payment withdrawal method" },
+        "paymentAddress": { "type": "string", "description": "Details like phone number/wallet ID for withdrawal" },
+        "updatedAt": { "type": "string", "format": "date-time", "description": "Timestamp of last edit" }
+      },
+      "required": ["email"]
+    },
+    "Task": {
+      "title": "Task",
+      "description": "Daily earning opportunity task managed by admins.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "title": { "type": "string" },
+        "description": { "type": "string" },
+        "reward": { "type": "number" },
+        "category": { "type": "string" },
+        "link": { "type": "string" },
+        "status": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["title", "reward", "category", "link"]
+    },
+    "TaskCompletion": {
+      "title": "TaskCompletion",
+      "description": "Log of completed tasks by a user.",
+      "type": "object",
+      "properties": {
+        "taskId": { "type": "string" },
+        "completedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["taskId", "completedAt"]
+    },
+    "Withdrawal": {
+      "title": "Withdrawal",
+      "description": "A pending or processed payout withdrawal request.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "userId": { "type": "string" },
+        "userName": { "type": "string" },
+        "coins": { "type": "number" },
+        "amount": { "type": "number" },
+        "paymentMethod": { "type": "string" },
+        "paymentAddress": { "type": "string" },
+        "status": { "type": "string", "enum": ["pending", "approved", "rejected"] },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["userId", "userName", "coins", "amount", "paymentMethod", "paymentAddress", "status", "createdAt"]
+    },
+    "Quiz": {
+      "title": "Quiz",
+      "description": "Interactive earning quizzes with nested questions.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "title": { "type": "string" },
+        "category": { "type": "string" },
+        "questions": { "type": "array" },
+        "reward": { "type": "number" }
+      },
+      "required": ["title", "category", "questions", "reward"]
+    },
+    "Notification": {
+      "title": "Notification",
+      "description": "System-wide or user-specific announcements and alerts.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "message": { "type": "string" },
+        "type": { "type": "string", "enum": ["system", "reward", "withdraw"] },
+        "userId": { "type": "string", "description": "Target user UI, or 'all'" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["message", "type", "userId", "createdAt"]
+    }
+  },
+  "firestore": {
+    "users/{userId}": {
+      "schema": { "$ref": "#/entities/User" },
+      "description": "Public metadata for user dashboard and leaderboard."
+    },
+    "users/{userId}/private/info": {
+      "schema": { "$ref": "#/entities/UserPrivate" },
+      "description": "Private profile settings and credentials."
+    },
+    "users/{userId}/completions/{completionId}": {
+      "schema": { "$ref": "#/entities/TaskCompletion" },
+      "description": "Dynamic lookup of task completion statuses."
+    },
+    "tasks/{taskId}": {
+      "schema": { "$ref": "#/entities/Task" },
+      "description": "Admin configurable daily task items."
+    },
+    "withdrawals/{withdrawId}": {
+      "schema": { "$ref": "#/entities/Withdrawal" },
+      "description": "Payout requests filed by users, manageable by admin."
+    },
+    "quizzes/{quizId}": {
+      "schema": { "$ref": "#/entities/Quiz" },
+      "description": "Earning quiz schemas."
+    },
+    "notifications/{notificationId}": {
+      "schema": { "$ref": "#/entities/Notification" },
+      "description": "Global and private messages list."
+    }
+  }
+}

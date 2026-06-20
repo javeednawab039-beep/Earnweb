@@ -1,0 +1,6 @@
+{
+  "name": "EarnHub AI",
+  "description": "A premium and responsive Earn Money web application with dynamic tasks, quizzes, mini-games, and withdrawal rewards powered by Firebase.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

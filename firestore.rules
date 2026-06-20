@@ -1,0 +1,114 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Global Safety Net catch-all
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // --- REUSABLE SECURITY PRIMITIVES ---
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isVerifiedUser() {
+      return isSignedIn() && request.auth.token.email_verified == true;
+    }
+
+    function isAdmin() {
+      return isVerifiedUser() && request.auth.token.email == "javeednawab039@gmail.com";
+    }
+
+    function isValidId(id) {
+      return id is string && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    function incoming() {
+      return request.resource.data;
+    }
+
+    function existing() {
+      return resource.data;
+    }
+
+    // --- COLLECTION MATCHES ---
+
+    // USERS COLLECTION
+    match /users/{userId} {
+      function isValidUser(data) {
+        return data.displayName is string && data.displayName.size() <= 100
+            && data.coins is number && data.coins >= 0
+            && data.pkr is number && data.pkr >= 0
+            && data.referralCode is string && data.referralCode.size() <= 20
+            && data.referralsCount is number && data.referralsCount >= 0
+            && data.tasksCount is number && data.tasksCount >= 0;
+      }
+
+      allow get, list: if isSignedIn();
+      allow create: if isVerifiedUser() 
+                    && userId == request.auth.uid 
+                    && isValidUser(incoming())
+                    && incoming().coins == 0 
+                    && incoming().pkr == 0;
+      
+      allow update: if isVerifiedUser() 
+                    && (isAdmin() || (
+                      userId == request.auth.uid 
+                      && isValidUser(incoming())
+                      && (
+                        // Case A: Increment coins/pkr (tasks completion, spin, quiz reward, claim bonus etc.)
+                        incoming().diff(existing()).affectedKeys().hasOnly(['coins', 'pkr', 'dailyBonusLastClaimed', 'level', 'tasksCount', 'referralsCount'])
+                        ||
+                        // Case B: Profile details change
+                        incoming().diff(existing()).affectedKeys().hasOnly(['displayName', 'photoURL'])
+                      )
+                    ));
+      allow delete: if isAdmin();
+    }
+
+    // USERS PRIVATE SENSITIVE INFO
+    match /users/{userId}/private/info {
+      allow get, create, update: if isVerifiedUser() && userId == request.auth.uid;
+      allow list: if isSignedIn() && userId == request.auth.uid;
+      allow delete: if isAdmin();
+    }
+
+    // TASK COMPLETIONS
+    match /users/{userId}/completions/{completionId} {
+      allow read, create, update, delete: if isVerifiedUser() && userId == request.auth.uid;
+    }
+
+    // ADMIN DIRECTORY FOR DAILY TASKS
+    match /tasks/{taskId} {
+      allow read: if isSignedIn();
+      allow create, update, delete: if isAdmin();
+    }
+
+    // ADMIN DIRECTORY FOR QUIZZES
+    match /quizzes/{quizId} {
+      allow read: if isSignedIn();
+      allow create, update, delete: if isAdmin();
+    }
+
+    // Payout withdrawals request list
+    match /withdrawals/{withdrawId} {
+      allow list: if isVerifiedUser() && (resource.data.userId == request.auth.uid || isAdmin());
+      allow get: if isVerifiedUser() && (resource.data.userId == request.auth.uid || isAdmin());
+      allow create: if isVerifiedUser() 
+                    && incoming().userId == request.auth.uid
+                    && incoming().status == 'pending'
+                    && incoming().coins is number 
+                    && incoming().amount is number 
+                    && incoming().paymentMethod is string
+                    && incoming().paymentAddress is string;
+      allow update, delete: if isAdmin();
+    }
+
+    // Notifications (system or private)
+    match /notifications/{notificationId} {
+      allow get, list: if isSignedIn() && (resource.data.userId == 'all' || resource.data.userId == request.auth.uid);
+      allow create, update, delete: if isAdmin();
+    }
+  }
+}
